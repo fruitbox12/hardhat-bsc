@@ -425,7 +425,7 @@ var ZapMedia = /** @class */ (function () {
                     // this.ensureNotReadOnly()
                     (0, utils_1.validateURI)(mediaData.metadataURI);
                     (0, utils_1.validateURI)(mediaData.tokenURI);
-                    (0, utils_1.validateBidShares)(bidShares.collabShares, bidShares.owner, bidShares.owner);
+                    (0, utils_1.validateBidShares)(bidShares.collabShares, bidShares.creator, bidShares.owner);
                 }
                 catch (err) {
                     return [2 /*return*/, Promise.reject(err.message)];
@@ -597,9 +597,9 @@ var ZapMedia = /** @class */ (function () {
         });
     };
     /****************
-   * Miscellaneous
-   * **************
-   */
+     * Miscellaneous
+     * **************
+     */
     /**
      * Returns the EIP-712 Domain for an instance of the Zora Media Contract
      */

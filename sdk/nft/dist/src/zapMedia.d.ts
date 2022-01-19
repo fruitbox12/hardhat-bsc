@@ -175,9 +175,9 @@ declare class ZapMedia {
      */
     isValidBid(mediaId: BigNumberish, bid: any): Promise<boolean>;
     /****************
-   * Miscellaneous
-   * **************
-   */
+     * Miscellaneous
+     * **************
+     */
     /**
      * Returns the EIP-712 Domain for an instance of the Zora Media Contract
      */
