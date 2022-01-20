@@ -123,10 +123,30 @@ class AuctionHouse {
   }
 
   public async endAuction(auctionId: BigNumberish) {
+    // Checks if the auctionId exists if not throw an error
+    try {
+      await this.auctionHouse.endAuction(auctionId);
+    } catch {
+      invariant(false, 'AuctionHouse (endAuction): Auction does not exist.');
+    }
     return this.auctionHouse.endAuction(auctionId);
   }
 
   public async cancelAuction(auctionId: BigNumberish) {
+    const auctionInfo = await this.fetchAuction(auctionId);
+
+    // If the auctionId does not exist throw an error
+    if (auctionInfo.token.mediaContract === ethers.constants.AddressZero) {
+      invariant(false, 'AuctionHouse (cancelAuction): Auction does not exist.');
+    }
+    // If the auction firstBidTime is not 0 throw an error
+    else if (parseInt(auctionInfo.firstBidTime._hex) !== 0) {
+      invariant(false, 'AuctionHouse (cancelAuction): Auction has already started.');
+    }
+    // If the fetched curator address does not equal the caller address throw an error
+    else if (auctionInfo.curator !== (await this.signer.getAddress())) {
+      invariant(false, 'AuctionHouse (cancelAuction): Only the curator can cancel this auction.');
+    }
     return this.auctionHouse.cancelAuction(auctionId);
   }
 
