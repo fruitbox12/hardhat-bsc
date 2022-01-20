@@ -705,7 +705,7 @@ describe('AuctionHouse', () => {
 
     // // start end auction
 
-    describe.only("#cancelAuction", () => {
+    describe("#cancelAuction", () => {
       let auctionHouse: AuctionHouse;
       let curatorConnected: AuctionHouse;
       let bidderConnected: AuctionHouse;
