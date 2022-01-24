@@ -595,6 +595,22 @@ describe('AuctionHouse', () => {
         //   expect(endedAuction.curator).to.equal(await curator.getAddress());
         //   expect(endedAuction.auctionCurrency).to.equal(token.address);
         // });
+
+        // * test from zora
+        // it("should cancel the auction if the winning bidder is unable to receive NFTs", async () => {
+        //   await badBidder.placeBid(0, TWO_ETH, { value: TWO_ETH });
+        //   const endTime =
+        //     (await auctionHouse.auctions(0)).duration.toNumber() +
+        //     (await auctionHouse.auctions(0)).firstBidTime.toNumber();
+        //   await ethers.provider.send("evm_setNextBlockTimestamp", [endTime + 1]);
+    
+        //   await auctionHouse.endAuction(0);
+    
+        //   expect(await media.ownerOf(0)).to.eq(await creator.getAddress());
+        //   expect(await ethers.provider.getBalance(badBidder.address)).to.eq(
+        //     TWO_ETH
+        //   );
+        // });
       });
 
     describe("#cancelAuction", () => {
