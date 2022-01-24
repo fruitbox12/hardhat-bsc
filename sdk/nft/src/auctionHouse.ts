@@ -124,13 +124,46 @@ class AuctionHouse {
   }
 
   public async endAuction(auctionId: BigNumberish) {
+    // * Only end auction if 1) at least one bid exists, 2) it is still listed auction and 3) firstBidTime to set duration is equal or greater than firstBidTime to Date.now() and 4) signer is curator
+    // 1  check if auctionid exists (#2)
+    // 2  check if firstBidTime !== 0  (only end when timer is set at 0; #1, #3)
+    // 4 check if signer is curator of the auction (#4)
+    // =============
     // Checks if the auctionId exists if not throw an error
     try {
-      await this.auctionHouse.endAuction(auctionId);
+      const auctionInfo = await this.fetchAuction(auctionId);
     } catch {
-      invariant(false, 'AuctionHouse (endAuction): Auction does not exist.');
+      invariant(false, 'AuctionHouse (endAuction): AuctionId does not exist.');
     }
-    return this.auctionHouse.endAuction(auctionId);
+
+    const auctionInfo = await this.fetchAuction(auctionId);
+
+      if (!auctionInfo) {
+        invariant(false, 'AuctionHouse (endAuction): AuctionId does not exist.');
+      } else {
+        if (auctionInfo.firstBidTime) {
+          console.log(parseInt(auctionInfo.firstBidTime._hex));
+        }
+        // Check if at least one bidder exists, else throw an error
+        if (auctionInfo.bidder !== ethers.constants.AddressZero) {
+          console.log(auctionInfo)
+          invariant(false, 'AuctionHouse (endAuction): Auction has already started.');
+        } 
+        // Check if first bid time is equal or greater than current time, else throw an error
+        else if (parseInt(auctionInfo.firstBidTime._hex) !== 0) {
+          invariant(false, 'AuctionHouse (endAuction): Auction has already started.');
+        }
+        // Check if the signer is the curator, if not throw an error
+        else if (auctionInfo.curator !== (await this.signer.getAddress())) {
+          invariant(false, 'AuctionHouse (endAuction): Only the curator can end this auction.');
+        }
+        return this.auctionHouse.endAuction(auctionId);
+      }
+
+  // else if (Date.parse(Date.now().toString()) - parseInt(auctionInfo.firstBidTime._hex) < parseInt(auctionInfo.duration._hex)) {
+  //   invariant(false, 'AuctionHouse (endAuction): Auction has not ended yet.');
+  // } ;
+  
   }
 
   public async cancelAuction(auctionId: BigNumberish) {
@@ -172,5 +205,32 @@ class AuctionHouse {
     }
   }
 }
+
+// function _handleZoraAuctionSettlement(uint256 auctionId) internal returns (bool, uint256) {
+//   address currency = auctions[auctionId].auctionCurrency == ethers.constants.AddressZero ? wethAddress : auctions[auctionId].auctionCurrency;
+
+//   IMarket.Bid memory bid = IMarket.Bid({
+//       amount: auctions[auctionId].amount,
+//       currency: currency,
+//       bidder: address(this),
+//       recipient: auctions[auctionId].bidder,
+//       sellOnShare: Decimal.D256(0)
+//   });
+
+//   IERC20(currency).approve(IMediaExtended(zora).marketContract(), bid.amount);
+//   IMedia(zora).setBid(auctions[auctionId].tokenId, bid);
+//   uint256 beforeBalance = IERC20(currency).balanceOf(address(this));
+//   try IMedia(zora).acceptBid(auctions[auctionId].tokenId, bid) {} catch {
+//       // If the underlying NFT transfer here fails, we should cancel the auction and refund the winner
+//       IMediaExtended(zora).removeBid(auctions[auctionId].tokenId);
+//       return (false, 0);
+//   }
+//   uint256 afterBalance = IERC20(currency).balanceOf(address(this));
+
+//   // We have to calculate the amount to send to the token owner here in case there was a
+//   // sell-on share on the token
+//   return (true, afterBalance.sub(beforeBalance));
+// }
+
 
 export default AuctionHouse;
